@@ -15,7 +15,7 @@ To add a dependency:
 uv add name-of-dependency
 ```
 
-Tu run project:
+To run the project:
 
 ```bash
 uv run src/main.py # Or whichever file you want.
