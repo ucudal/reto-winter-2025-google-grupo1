@@ -1,6 +1,6 @@
 # reto-winter-2025-google
 
-### Docs for devs
+## Docs for devs
 
 Use [uv](https://docs.astral.sh/uv/getting-started/installation/#__tabbed_1_1)
 as dependency manager. In windows you may need to restart your pc.
