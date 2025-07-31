@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from functools import cache
 from google import genai
 from google.genai.types import Part
@@ -15,19 +15,21 @@ def get_chat(id: str):
     return get_client(env().google_cloud_api_key).chats.create(model="gemini-2.0-flash")
 
 
-def answer(message: Sequence[Part]) -> list[Part]:
+def answer(message: Sequence[Part]) -> Iterator[list[Part]]:
     chat = get_chat("test")
 
-    response = chat.send_message(list(message))
+    response = chat.send_message_stream(list(message))
 
-    if (
-        not response.candidates
-        or not response.candidates[0].content
-        or not response.candidates[0].content.parts
-    ):
-        return [Part.from_text(text="Ocurrió un error")]
+    for chunk in response:
+        if (
+            not chunk.candidates
+            or not chunk.candidates[0].content
+            or not chunk.candidates[0].content.parts
+        ):
+            yield [Part.from_text(text="Ocurrió un error")]
+            return
 
-    return response.candidates[0].content.parts
+        yield chunk.candidates[0].content.parts
 
 
 def get_history() -> list[Part]: ...

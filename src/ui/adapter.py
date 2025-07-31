@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 import mimetypes
 from pathlib import Path
 
@@ -27,10 +27,15 @@ def handle_files(files: Sequence[Path]) -> list[Part]:
     return parts
 
 
-def ui_to_chat(message: UserInput) -> UserInput:
+def ui_to_chat(message: UserInput) -> Iterator[UserInput]:
     files = handle_files([Path(file) for file in message["files"]])
     text = Part.from_text(text=message["text"])
 
     response = answer(files + [text])
 
-    return {"text": response[0].text or "What", "files": []}
+    text = ""
+
+    for chunk in response:
+        text += chunk[0].text or ""
+        yield {"text": text or "What", "files": []}
+

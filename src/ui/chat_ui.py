@@ -1,13 +1,13 @@
-from pathlib import Path
-from typing import TypedDict
+from collections.abc import Iterator
 import gradio
 
 from ui.adapter import ui_to_chat
 from ui.types import UserInput
 
 
-def resolve(message: UserInput, _history: list[str]):
-    yield ui_to_chat(message)
+def resolve(message: UserInput, _history: list[str]) -> Iterator[str]:
+    for chunk in ui_to_chat(message):
+        yield chunk["text"]
 
 
 def main():
