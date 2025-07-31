@@ -1,4 +1,5 @@
 from collections.abc import Iterator, Sequence
+from collections.abc import Sequence
 from functools import cache
 from google import genai
 from google.genai.types import Part
@@ -30,6 +31,5 @@ def answer(message: Sequence[Part]) -> Iterator[list[Part]]:
             return
 
         yield chunk.candidates[0].content.parts
-
 
 def get_history() -> list[Part]: ...

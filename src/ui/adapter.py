@@ -38,4 +38,3 @@ def ui_to_chat(message: UserInput) -> Iterator[UserInput]:
     for chunk in response:
         text += chunk[0].text or ""
         yield {"text": text or "What", "files": []}
-
