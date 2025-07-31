@@ -7,4 +7,10 @@ class Environment(BaseModel, frozen=True):
 
 @cache
 def env() -> Environment:
+    """
+    Return a cached, validated `Environment` instance populated from the current environment variables.
+    
+    Returns:
+        Environment: An immutable model containing environment configuration values.
+    """
     return Environment.model_validate(dict(os.environ))

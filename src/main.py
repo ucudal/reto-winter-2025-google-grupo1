@@ -7,6 +7,11 @@ from env import env
 from google import genai
 
 def main() -> None:
+    """
+    Runs a demonstration of interacting with the Gemini 2.0 Flash chat model using the genai client.
+    
+    Prints environment configuration, sends a sequence of messages to the chat model in two separate sessions (one with default settings, one with an explicit empty tools configuration), and prints selected parts of the responses for each message.
+    """
     print(f"{env() = }")
 
     client = genai.Client(api_key=env().google_cloud_api_key)

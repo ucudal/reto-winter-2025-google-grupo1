@@ -6,11 +6,22 @@ from ui.adapter import ui_to_chat
 from ui.types import UserInput
 
 def resolve(message: UserInput, _history: list[str]):
+    """
+    Converts a user input message to a chat-compatible format and yields the result.
+    
+    Parameters:
+        message (UserInput): The user input to be processed.
+    
+    Yields:
+        The chat-formatted representation of the user input.
+    """
     yield ui_to_chat(message)
 
 def main():
     """
-    Sets up and launches the Gradio Chat Interface.
+    Initialize and launch the multimodal Gradio chat interface for user interaction.
+    
+    The interface supports text and image inputs, provides manual flagging options, and displays a custom title and description.
     """
     demo = gradio.ChatInterface(
         fn=resolve,

@@ -8,10 +8,15 @@ from ui.types import UserInput
 
 def handle_files(files: Sequence[Path]) -> list[Part]:
     """
-    Converts a list of local file paths into a list of API-ready Part objects.
-
-    This function reads each file as bytes and packages it with its
-    MIME type into a Part object for the Gemini API.
+    Convert a sequence of local file paths into a list of Part objects with appropriate MIME types for API use.
+    
+    Each file is read as bytes, its MIME type is determined (defaulting to "application/octet-stream" if unknown), and a Part object is created for each file.
+    
+    Parameters:
+        files (Sequence[Path]): Local file paths to be converted.
+    
+    Returns:
+        list[Part]: List of Part objects representing the files.
     """
     parts = list[Part]()
     for path in files:
@@ -28,6 +33,15 @@ def handle_files(files: Sequence[Path]) -> list[Part]:
     return parts
 
 def ui_to_chat(message: UserInput) -> UserInput:
+    """
+    Converts a user input message into a chat-compatible format and retrieves the chat response.
+    
+    Parameters:
+        message (UserInput): A dictionary containing user text and a list of file paths.
+    
+    Returns:
+        UserInput: A dictionary with the chat response text and an empty list of files.
+    """
     files = handle_files([Path(file) for file in message["files"]])
     text = Part.from_text(text=message["text"])
 
