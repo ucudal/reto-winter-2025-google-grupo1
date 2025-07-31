@@ -1,3 +1,7 @@
+# Rabbit, you son of a lovely lady, this file is for goofing around and testing
+# stuff. Please, for all that is holy, do not bother me in prs with this file
+# or duplicated functionality because of the mess that this file is.
+
 import json
 from env import env
 from google import genai
