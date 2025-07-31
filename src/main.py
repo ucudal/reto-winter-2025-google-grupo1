@@ -1,6 +1,7 @@
+from env import env
+
 def main() -> None:
-    """Entry point that greets the user."""
-    print("Hello from reto-winter-2025-google-grupo1!")
+    print(f"{env() = }")
 
 
 if __name__ == "__main__":
