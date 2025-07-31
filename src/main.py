@@ -4,7 +4,6 @@ from env import env
 from google import genai
 
 def main() -> None:
-    print(f"{env() = }")
 
     client = genai.Client(api_key=env().google_cloud_api_key)
 
