@@ -5,8 +5,10 @@ import gradio
 from ui.adapter import ui_to_chat
 from ui.types import UserInput
 
+
 def resolve(message: UserInput, _history: list[str]):
     yield ui_to_chat(message)
+
 
 def main():
     """
@@ -22,7 +24,6 @@ def main():
     )
 
     _ = demo.launch()
-
 
 
 if __name__ == "__main__":

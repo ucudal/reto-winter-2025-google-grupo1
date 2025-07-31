@@ -6,6 +6,7 @@ from google.genai.types import Part
 from chat.chat import answer
 from ui.types import UserInput
 
+
 def handle_files(files: Sequence[Path]) -> list[Part]:
     """
     Converts a list of local file paths into a list of API-ready Part objects.
@@ -20,12 +21,11 @@ def handle_files(files: Sequence[Path]) -> list[Part]:
         if mime_type is None:
             mime_type = "application/octet-stream"
 
-        file_bytes = Path(path).read_bytes()
-
         # Create the Part object with the file's data and MIME type
-        parts.append(Part.from_bytes(data=file_bytes, mime_type=mime_type))
+        parts.append(Part.from_bytes(data=path.read_bytes(), mime_type=mime_type))
 
     return parts
+
 
 def ui_to_chat(message: UserInput) -> UserInput:
     files = handle_files([Path(file) for file in message["files"]])
@@ -33,5 +33,4 @@ def ui_to_chat(message: UserInput) -> UserInput:
 
     response = answer(files + [text])
 
-
-    return { "text": response[0].text or "What", "files": [] }
+    return {"text": response[0].text or "What", "files": []}

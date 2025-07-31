@@ -6,6 +6,7 @@ import json
 from env import env
 from google import genai
 
+
 def main() -> None:
     print(f"{env() = }")
 
@@ -13,10 +14,14 @@ def main() -> None:
 
     chat = client.chats.create(model="gemini-2.0-flash")
 
-    for message in ["what the dog doin", "whos a good boi", "summarize what we have been talking about."]:
+    for message in [
+        "what the dog doin",
+        "whos a good boi",
+        "summarize what we have been talking about.",
+    ]:
         print(f"{message = }")
         response = chat.send_message(message)
-        print(f"{(response.candidates or [])[0].content.parts[0] = }") # pyright: ignore[]
+        print(f"{(response.candidates or [])[0].content.parts[0] = }")  # pyright: ignore[]
 
     client = genai.Client(api_key=env().google_cloud_api_key)
 
