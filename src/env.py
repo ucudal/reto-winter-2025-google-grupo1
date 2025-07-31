@@ -1,7 +1,6 @@
 from functools import cache
 import os
-from typing import ClassVar
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, Field
 
 
 class Environment(BaseModel, frozen=True):

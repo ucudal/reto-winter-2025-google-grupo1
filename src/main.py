@@ -6,7 +6,7 @@ from google import genai
 def main() -> None:
     client = genai.Client(api_key=env().google_cloud_api_key)
 
-    chat = client.chats.create(model="gemini-2.0-flash", config={ "tools": [] })
+    chat = client.chats.create(model="gemini-2.0-flash", config={"tools": []})
 
     for message in [
         "what the dog doin",
