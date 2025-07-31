@@ -18,8 +18,11 @@ uv add name-of-dependency
 To run the project:
 
 ```bash
-uv run src/main.py # Or whichever file you want.
+uv run --env-file=.env src/main.py # Or whichever file you want.
 ```
+
+You can see the expected environment variables and their structure in
+[the environment parser](./src/env.py).
 
 ### TODOs
 

@@ -4,7 +4,13 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "google-genai>=1.28.0",
+    "pydantic>=2.11.7",
+]
+
+[tool.ruff]
+line-length = 100
 
 [tool.uv]
 package = true
