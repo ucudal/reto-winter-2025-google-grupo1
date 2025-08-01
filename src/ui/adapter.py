@@ -1,13 +1,16 @@
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterable, Iterator
 import mimetypes
 from pathlib import Path
+from typing import cast
 
 from google.genai.types import Part
+from gradio import Component
 from chat.chat import answer
-from ui.types import UserInput
+from ui.types import Content, UserInput
 
+MimeType = str
 
-def handle_files(files: Sequence[Path]) -> list[Part]:
+def handle_files(files: Iterable[tuple[Path, MimeType | None]]) -> list[Part]:
     """
     Converts a list of local file paths into a list of API-ready Part objects.
 
@@ -15,23 +18,26 @@ def handle_files(files: Sequence[Path]) -> list[Part]:
     MIME type into a Part object for the Gemini API.
     """
     parts = list[Part]()
-    for path in files:
-        mime_type, _ = mimetypes.guess_type(path)
+
+    for path, mime_type in files:
 
         if mime_type is None:
-            mime_type = "application/octet-stream"
+            mime_type, _ = mimetypes.guess_type(path)
 
-        # Create the Part object with the file's data and MIME type
+        assert mime_type is not None
+
         parts.append(Part.from_bytes(data=path.read_bytes(), mime_type=mime_type))
 
     return parts
 
+def extract_parts(content: UserInput) -> list[Part]:
+    paths = ((Path(path), None) for path in content["files"])
+    return [Part.from_text(text=content["text"])] + list(handle_files(paths))
 
 def ui_to_chat(message: UserInput) -> Iterator[UserInput]:
-    files = handle_files([Path(file) for file in message["files"]])
-    text = Part.from_text(text=message["text"])
+    parts = extract_parts(message)
 
-    response = answer(files + [text])
+    response = answer(parts)
 
     text = ""
 

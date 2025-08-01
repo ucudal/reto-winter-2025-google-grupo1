@@ -1,5 +1,10 @@
 from typing import TypedDict
 
+from gradio import Component
+from gradio.components.chatbot import FileDataDict
+
+Content = str | FileDataDict | tuple[object, ...] | Component
+
 
 class UserInput(TypedDict):
     text: str
