@@ -1,7 +1,8 @@
 from pydantic_ai import RunContext
 from pydantic_ai.toolsets import CombinedToolset, FunctionToolset
 
-from chat.dependencies import Dependencies
+from chat.types import Dependencies
+
 
 _local_funcs = FunctionToolset[Dependencies]()
 

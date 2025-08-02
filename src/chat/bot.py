@@ -2,15 +2,14 @@ from typing import final
 
 from pydantic_ai import Agent
 from pydantic_ai.messages import UserPromptPart
-from pydantic_ai.models.google import GoogleModel
-from pydantic_ai.settings import ModelSettings
+from pydantic_ai.models.google import GoogleModel, GoogleModelSettings
 from pydantic_ai.providers.google import GoogleProvider
 
-from chat.dependencies import Dependencies
+from chat.memory import retrieve_conversation, set_conversation
 from chat.tools import toolset
+from chat.types import Dependencies, UserId
 from env import Environment
 
-UserId = str
 
 @final
 class Bot:
@@ -22,10 +21,13 @@ class Bot:
 
     def make_agent(self) -> Agent[Dependencies, str]:
         return Agent(
-            GoogleModel("gemini-2.5-flash", provider=GoogleProvider(api_key=self.__env.google_cloud_api_key), settings=ModelSettings()),
+            GoogleModel(
+                "gemini-2.5-flash",
+                provider=GoogleProvider(api_key=self.__env.google_cloud_api_key),
+                settings=GoogleModelSettings(),
+            ),
             toolsets=[toolset.main_toolset],
-            deps_type=Dependencies
-
+            deps_type=Dependencies,
         )
 
     def get_agent(self, userId: UserId) -> Agent[Dependencies, str]:
@@ -38,13 +40,18 @@ class Bot:
         return agent
 
     def get_dependencies(self) -> Dependencies:
-        return Dependencies(
-            env=self.__env
-        )
+        return Dependencies(env=self.__env)
 
     async def answer(self, message: UserPromptPart, /, *, user_id: UserId):
         agent = self.get_agent(user_id)
+        history = retrieve_conversation(user_id)
 
-        async with agent.run_stream(user_prompt=message.content, deps=self.get_dependencies()) as response:
+        async with agent.run_stream(
+            user_prompt=message.content, deps=self.get_dependencies(), message_history=history
+        ) as response:
             async for chunk in response.stream():
                 yield chunk
+
+            history = response.all_messages()
+
+        set_conversation(user_id, history)
