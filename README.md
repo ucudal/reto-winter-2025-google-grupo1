@@ -25,7 +25,7 @@ teachers, and other members of the university.
 The project is built using Python 3.13 with [uv](https://docs.astral.sh/uv/).
 
 The chatbot uses Vertex AI for its core functionality, which includes
-natural language processing, machine learning, deepsearch and data analysis.
+natural language processing, machine learning, deep search and data analysis.
 It leverages the Google Cloud Platform to access various services such as
 Google Cloud Storage for file storage and Google BigQuery for data analysis.
 
