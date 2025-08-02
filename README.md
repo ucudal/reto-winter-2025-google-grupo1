@@ -32,7 +32,7 @@ Google Cloud Storage for file storage and Google BigQuery for data analysis.
 ## Docs for devs
 Use [uv](https://docs.astral.sh/uv/getting-started/installation/#__tabbed_1_1)
 as the dependency manager. On Windows you may need to restart your PC after
-install.
+installation.
 
 Avoid using `pip`, since that may make you install a dependency globally, and
 other contributors won't be able to use it because of that. `uv` ensures your
