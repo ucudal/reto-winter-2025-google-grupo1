@@ -9,7 +9,7 @@ EnvironmentKind = Literal["prod", "dev"]
 class Environment(BaseModel, frozen=True):
     google_cloud_api_key: str = Field(alias="GOOGLE_CLOUD_API_KEY")
     environment: EnvironmentKind =  Field(default="dev", alias="ENVIRONMENT")
-    user_id: str = Field(default=str(uuid4()), alias="USER_ID")
+    user_id: str = Field(default_factory=lambda: str(uuid4()), alias="USER_ID")
 
 
 # This is the only global state, but that's intentional.
