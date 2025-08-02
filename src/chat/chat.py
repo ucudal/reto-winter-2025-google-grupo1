@@ -1,8 +1,12 @@
 from collections.abc import Sequence
 from functools import cache
+from typing import final
 from google import genai
-from google.genai.types import Part
-from env import env
+from google.genai.chats import Chat
+from google.genai.types import FunctionCallingConfigMode, Part
+from chat.tool_use.decorator import ToolBag
+
+UserId = str
 
 
 @cache
@@ -10,24 +14,50 @@ def get_client(api_key: str):
     return genai.Client(api_key=api_key)
 
 
-@cache
-def get_chat(id: str):
-    return get_client(env().google_cloud_api_key).chats.create(model="gemini-2.0-flash")
+@final
+class Bot:
+    def __init__(
+        self, *, tool_bag: ToolBag, api_key: str, chats: dict[UserId, Chat] | None = None
+    ) -> None:
+        self.chats = chats or {}
+        self.__api_key = api_key
+        self.tool_bag = tool_bag
 
+    def get_tools(self):
+        return self.tool_bag.get_tools()
 
-def answer(message: Sequence[Part]) -> list[Part]:
-    chat = get_chat("test")
+    def make_chat(self) -> Chat:
+        return get_client(self.__api_key).chats.create(model="gemini-2.0-flash")
 
-    response = chat.send_message(list(message))
+    def get_chat(self, userId: UserId) -> Chat:
+        chat = self.chats.get(userId)
 
-    if (
-        not response.candidates
-        or not response.candidates[0].content
-        or not response.candidates[0].content.parts
-    ):
-        return [Part.from_text(text="Ocurrió un error")]
+        if chat is None:
+            chat = self.make_chat()
+            self.chats[userId] = chat
 
-    return response.candidates[0].content.parts
+        return chat
 
+    def answer(self, message: Sequence[Part], /, *, user_id: UserId) -> list[Part]:
+        chat = self.get_chat(user_id)
 
-def get_history() -> list[Part]: ...
+        response = chat.send_message(
+            list(message),
+            config={
+                "tool_config": {
+                    "function_calling_config": {
+                        "mode": FunctionCallingConfigMode.AUTO,
+                    },
+                },
+                "tools": list(self.get_tools()),
+            },
+        )
+
+        if (
+            not response.candidates
+            or not response.candidates[0].content
+            or not response.candidates[0].content.parts
+        ):
+            return [Part.from_text(text="Ocurrió un error")]
+
+        return response.candidates[0].content.parts
