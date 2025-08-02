@@ -2,12 +2,31 @@
 name = "reto-winter-2025-google-grupo1"
 version = "0.1.0"
 description = "Chatbot for Centro Ithaka"
+license = { text = "GNU AGPLv3" }
 authors = [
-	{ name = "Santiago Panozzo", email = "santiagopanozzoa@outlook.com" },
-	{ name = "Cristian Rodriguez", email = "ezponjares@gmail.com" },
-	{ name = "Francisco Nasso", email = "Francisconasso@gmail.com" },
-	{ name = "Milagros Kucharski", email = "milakuchper@gmail.com" }
+    { name = "Santiago Panozzo" },
+    { name = "Cristian Rodriguez" },
+    { name = "Francisco Nasso" },
+    { name = "Milagros Kucharski" }
 ]
+
+[tool.project.maintainers]
+[[tool.project.maintainers]]
+name = "Santiago Panozzo"
+email = "santiagopanozzoa@outlook.com"
+
+[[tool.project.maintainers]]
+name = "Cristian Rodriguez"
+email = "ezponjares@gmail.com"
+
+[[tool.project.maintainers]]
+name = "Francisco Nasso"
+email = "Francisconasso@gmail.com"
+
+[[tool.project.maintainers]]
+name = "Milagros Kucharski"
+email = "milakuchper@gmail.com"
+
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
