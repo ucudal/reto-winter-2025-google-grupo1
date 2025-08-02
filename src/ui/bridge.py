@@ -1,41 +1,49 @@
-from collections.abc import Sequence
+from collections.abc import AsyncIterable
 from functools import cache
 import mimetypes
 from pathlib import Path
 
-from google.genai.types import Part
+from pydantic_ai import BinaryContent
+from pydantic_ai.messages import TextPart, UserPromptPart
 from chat.factory import BotFactory
 from env import env
 from ui.types import UserInput
 
 
-def handle_files(files: Sequence[Path]) -> list[Part]:
-    """
-    Converts a list of local file paths into a list of API-ready Part objects.
+def handle_file(file_path: Path) -> BinaryContent | None:
+    path = Path(file_path)
 
-    This function reads each file as bytes and packages it with its
-    MIME type into a Part object for the Gemini API.
-    """
-    parts = list[Part]()
-    for path in files:
-        mime_type, _ = mimetypes.guess_type(path)
+    file_data = path.read_bytes()
 
-        if mime_type is None:
-            mime_type = "application/octet-stream"
+    mimetype, _ = mimetypes.guess_type(path)
 
-        # Create the Part object with the file's data and MIME type
-        parts.append(Part.from_bytes(data=path.read_bytes(), mime_type=mime_type))
+    if mimetype is None:
+        return None
 
-    return parts
+    return BinaryContent(
+        data=file_data,
+        media_type=mimetype
+    )
 
 @cache
 def get_bot():
     return BotFactory().default()
 
-def ui_to_chat(message: UserInput) -> UserInput:
-    files = handle_files([Path(file) for file in message["files"]])
-    text = Part.from_text(text=message["text"])
+async def ui_to_chat(message: UserInput) -> AsyncIterable[UserInput]:
+    files = [handle_file(Path(file)) for file in message["files"]]
+    files = [file for file in files if file]
 
-    response = get_bot().answer(files + [text], user_id=env().user_id)
+    text = TextPart(content=message["text"])
+    user_prompt = UserPromptPart(files + [message["text"]])
 
-    return {"text": response[0].text or "What", "files": []}
+    response = get_bot().answer(user_prompt, user_id=env().user_id)
+
+    text = ""
+
+    async for chunk in response:
+        text = chunk
+        yield {"text": text, "files": []}
+
+
+    yield {"text": text or "What", "files": []}
+
