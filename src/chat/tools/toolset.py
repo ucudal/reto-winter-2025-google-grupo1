@@ -34,5 +34,5 @@ def dev_debug_dependencies(ctx: RunContext[Dependencies], input: str) -> Depende
 # If you make other toolsets, add them here.
 # This is what is loaded into the bot.
 main_toolset = CombinedToolset[Dependencies]([_local_funcs]).filtered(
-    lambda ctx, tool: ctx.deps.env.environment != "dev" and not tool.name.startswith("dev_")
+    lambda ctx, tool: ctx.deps.env.environment == "dev" or not tool.name.startswith("dev_")
 )
