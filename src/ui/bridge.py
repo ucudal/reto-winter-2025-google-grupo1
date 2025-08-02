@@ -1,9 +1,11 @@
 from collections.abc import Sequence
+from functools import cache
 import mimetypes
 from pathlib import Path
 
 from google.genai.types import Part
-from chat.chat import answer
+from chat.factory import BotFactory
+from env import env
 from ui.types import UserInput
 
 
@@ -26,11 +28,14 @@ def handle_files(files: Sequence[Path]) -> list[Part]:
 
     return parts
 
+@cache
+def get_bot():
+    return BotFactory().default()
 
 def ui_to_chat(message: UserInput) -> UserInput:
     files = handle_files([Path(file) for file in message["files"]])
     text = Part.from_text(text=message["text"])
 
-    response = answer(files + [text])
+    response = get_bot().answer(files + [text], user_id=env().user_id)
 
     return {"text": response[0].text or "What", "files": []}

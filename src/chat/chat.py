@@ -1,10 +1,12 @@
 from collections.abc import Sequence
 from functools import cache
-from typing import final
+from typing import Callable, final
 from google import genai
 from google.genai.chats import Chat
-from google.genai.types import FunctionCallingConfigMode, Part
-from chat.tool_use.decorator import ToolBag
+from google.genai.types import (
+    GenerateContentConfig,
+    Part,
+)
 
 UserId = str
 
@@ -17,14 +19,15 @@ def get_client(api_key: str):
 @final
 class Bot:
     def __init__(
-        self, *, tool_bag: ToolBag, api_key: str, chats: dict[UserId, Chat] | None = None
+        self, *, tool_bag: list[Callable[..., object]], api_key: str, chats: dict[UserId, Chat] | None = None
     ) -> None:
         self.chats = chats or {}
         self.__api_key = api_key
         self.tool_bag = tool_bag
 
     def get_tools(self):
-        return self.tool_bag.get_tools()
+        print(f"{self.tool_bag = }")
+        return self.tool_bag
 
     def make_chat(self) -> Chat:
         return get_client(self.__api_key).chats.create(model="gemini-2.0-flash")
@@ -43,14 +46,7 @@ class Bot:
 
         response = chat.send_message(
             list(message),
-            config={
-                "tool_config": {
-                    "function_calling_config": {
-                        "mode": FunctionCallingConfigMode.AUTO,
-                    },
-                },
-                "tools": list(self.get_tools()),
-            },
+            config=GenerateContentConfig(tools=self.get_tools()),
         )
 
         if (
@@ -58,6 +54,7 @@ class Bot:
             or not response.candidates[0].content
             or not response.candidates[0].content.parts
         ):
+            print(f"{response = }")
             return [Part.from_text(text="Ocurrió un error")]
 
         return response.candidates[0].content.parts

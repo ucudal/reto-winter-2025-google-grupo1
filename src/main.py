@@ -21,7 +21,7 @@ def main() -> None:
     ]:
         print(f"{message = }")
         response = chat.send_message(message)
-        print(f"{(response.candidates or [])[0].content.parts[0] = }")  # pyright: ignore[]
+        print(f"{(response.candidates or [])[0].content.parts[0] = }")  # pyright: ignore[reportOptionalSubscript, reportOptionalMemberAccess]
 
     client = genai.Client(api_key=env().google_cloud_api_key)
 

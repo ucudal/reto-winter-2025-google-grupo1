@@ -1,39 +1,30 @@
 from random import random
 from typing import Literal
-from pydantic import BaseModel
-from chat.tool_use.decorator import ToolBag, tool
-from env import env
+from pydantic import BaseModel, Field
 
 
 # Always use pydantic models for complex objects.
 class ExampleParam(BaseModel):
     myParam: str
-    """
-    Dumy value. Set it to "wassup".
-    """
-
     someEnum: Literal["howdy", "dowdy!", "so based!"]
+
+def example_tool_func(param: ExampleParam) -> float:
     """
-    Choose one of these randomly.
+    This is an example function call to show developers.
+    Show it when asked for the test function.
+
+    You should make up the parameter values. If you are told to generate
+    incorrect values, try to do so and report the result.
+
+    Parameters:
+        :param: Example param value.
+
+    Returns:
+        A random number.
     """
+    output = random()
 
-class ExampleBag(ToolBag):
-    @tool(env().environment == "dev")
-    @staticmethod
-    def example_tool_func(param: ExampleParam) -> float:
-        """
-        This is an example function call to show developers.
-        Show it when asked for the test function.
+    print(f"Hi from example tool. {output = }")
+    print(f"{param = }")
 
-        Parameters:
-            :param: Example param value.
-
-        Returns:
-            A random number.
-        """
-        output = random()
-
-        print(f"Hi from example tool. {output = }")
-        print(f"{param = }")
-
-        return output
+    return output

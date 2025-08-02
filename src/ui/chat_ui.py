@@ -1,8 +1,6 @@
-from pathlib import Path
-from typing import TypedDict
 import gradio
 
-from ui.adapter import ui_to_chat
+from ui.bridge import ui_to_chat
 from ui.types import UserInput
 
 
