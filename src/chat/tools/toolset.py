@@ -6,6 +6,7 @@ from chat.types import Dependencies
 
 _local_funcs = FunctionToolset[Dependencies]()
 
+
 # Tools that start with dev_ are filtered in prod.
 @_local_funcs.tool
 def dev_debug_dependencies(ctx: RunContext[Dependencies], input: str) -> Dependencies:
@@ -28,6 +29,9 @@ def dev_debug_dependencies(ctx: RunContext[Dependencies], input: str) -> Depende
 
     return ctx.deps
 
+
 # If you make other toolsets, add them here.
 # This is what is loaded into the bot.
-main_toolset = CombinedToolset[Dependencies]([_local_funcs])
+main_toolset = CombinedToolset[Dependencies]([_local_funcs]).filtered(
+    lambda ctx, tool: ctx.deps.env.environment != "dev" and not tool.name.startswith("dev_")
+)
