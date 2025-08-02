@@ -21,11 +21,12 @@ def dev_debug_dependencies(ctx: RunContext[Dependencies], input: str) -> Depende
         :input: An arbitrary string. Put whatever there.
 
     Returns:
-        A random number.
+        The dependencies object.
     """
 
     print(f"{input = }")
-    print(f"{ctx.deps = }")
+    # Avoid printing sensitive data - only print safe fields
+    print(f"Environment: {ctx.deps.env.environment}")
 
     return ctx.deps
 
