@@ -1,7 +1,13 @@
 [project]
 name = "reto-winter-2025-google-grupo1"
 version = "0.1.0"
-description = "Add your description here"
+description = "Chatbot for Centro Ithaka"
+authors = [
+	{ name = "Santiago Panozzo", email = "santiagopanozzoa@outlook.com" },
+	{ name = "Cristian Rodriguez", email = "ezponjares@gmail.com" },
+	{ name = "Francisco Nasso", email = "Francisconasso@gmail.com" },
+	{ name = "Milagros Kucharski", email = "milakuchper@gmail.com" }
+]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
