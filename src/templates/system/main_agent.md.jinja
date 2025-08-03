@@ -1,0 +1,30 @@
+{# @param role: str #}
+{# @param expertise: list[string] #}
+{# @param context: str #}
+{# @param strict_mode: bool #}
+
+{% set system_name = {{ system_name }} %}
+{% set system_name = "AI Assistant" %}
+{% set version = "v2.1" %}
+
+
+# {{ system_name }} {{ version }}
+{% if role is not None %}
+You are {{ role | default("a helpful assistant") }}.
+{% endif %}
+
+
+{% if expertise %}
+Your areas of expertise include:
+{% for area in expertise %}
+- {{ area }}
+{% endfor %}
+{% endif %}
+
+{% set response_style = "concise" if brief_mode else "detailed" %}
+Please provide {{ response_style }} responses.
+
+{% if context %}
+## Context
+{{ context }}
+{% endif %}
