@@ -5,18 +5,22 @@ import os
 import tempfile
 import PyPDF2
 from ..env import env
+from typing import Tuple
 
 
-def get_clients():
+def get_clients() -> Tuple[storage.Client, bigquery.Client, genai]:
     """Get Google Cloud clients."""
-    # Configurar Google AI
-    genai.configure(api_key=env().google_cloud_api_key)
-    
-    return (
-        storage.Client(),
-        bigquery.Client(),
-        genai
-    )
+    try:
+        # Configurar Google AI
+        genai.configure(api_key=env().google_cloud_api_key)
+        
+        return (
+            storage.Client(),
+            bigquery.Client(),
+            genai
+        )
+    except Exception as e:
+        raise RuntimeError(f"Failed to initialize Google Cloud clients: {e}")
 
 
 def document_processing() -> None:
@@ -43,7 +47,13 @@ def document_processing() -> None:
         # Usar directorio temporal del sistema
         temp_dir = tempfile.gettempdir()
         local_path = os.path.join(temp_dir, blob.name.split('/')[-1])
-        blob.download_to_filename(local_path)
+        try:
+            blob.download_to_filename(local_path)
+            # Process file (existing code below)
+        finally:
+            # Clean up temporary file
+            if os.path.exists(local_path):
+                os.remove(local_path)
 
         # Extraer texto según el tipo de archivo
         if local_path.lower().endswith('.pdf'):
@@ -83,26 +93,31 @@ def document_processing() -> None:
             try:
                 with open(local_path, 'r', encoding='utf-8') as file:
                     texto = file.read()
-            except:
+            except (UnicodeDecodeError, IOError) as e:
+                print(f"Error reading file {blob.name}: {e}")
                 texto = f"Archivo: {blob.name}"
 
         # Dividir en fragmentos
         chunks = [texto[i:i+1000] for i in range(0, len(texto), 1000)]
 
         for chunk in chunks:
-            # Generar embedding usando Google AI
-            embedding_result = genai_client.embed_content(
-                model="models/embedding-001",
-                content=chunk,
-                task_type="retrieval_document"
-            )
-            embedding = embedding_result['embedding']
+            try:
+                # Generar embedding usando Google AI
+                embedding_result = genai_client.embed_content(
+                    model="models/embedding-001",
+                    content=chunk,
+                    task_type="retrieval_document"
+                )
+                embedding = embedding_result['embedding']
+            except Exception as e:
+                print(f"Error generating embedding for {blob.name}: {e}")
+                continue
 
             rows_to_insert.append({
                 "document_id": blob.name,
                 "fragment_text": chunk,
                 "embedding": embedding,
-                "created_at": datetime.datetime.now().isoformat()
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
             })
 
     # Insertar en BigQuery

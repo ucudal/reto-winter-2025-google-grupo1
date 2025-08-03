@@ -1,4 +1,14 @@
-.json
+# Google Cloud credentials
+credentials.json
+*-credentials.json
+
+# Local configuration files
+*-config.json
+local-*.json
+
+# Generated data files
+data/*.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
