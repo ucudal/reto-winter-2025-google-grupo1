@@ -22,7 +22,7 @@ class Bot:
     def make_agent(self) -> Agent[Dependencies, str]:
         return Agent(
             GoogleModel(
-                "gemini-2.5-flash",
+                "gemini-2.5-pro",
                 provider=GoogleProvider(api_key=self.__env.google_cloud_api_key),
                 settings=GoogleModelSettings(),
             ),
