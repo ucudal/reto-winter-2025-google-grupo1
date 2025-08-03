@@ -7,6 +7,7 @@ import PyPDF2
 from ..env import env
 from typing import Tuple
 
+from openpyxl import load_workbook
 
 def get_clients() -> Tuple[storage.Client, bigquery.Client, genai]:
     """Get Google Cloud clients."""
@@ -47,13 +48,7 @@ def document_processing() -> None:
         # Usar directorio temporal del sistema
         temp_dir = tempfile.gettempdir()
         local_path = os.path.join(temp_dir, blob.name.split('/')[-1])
-        try:
-            blob.download_to_filename(local_path)
-            # Process file (existing code below)
-        finally:
-            # Clean up temporary file
-            if os.path.exists(local_path):
-                os.remove(local_path)
+        blob.download_to_filename(local_path)
 
         # Extraer texto según el tipo de archivo
         if local_path.lower().endswith('.pdf'):
@@ -76,7 +71,6 @@ def document_processing() -> None:
         elif local_path.lower().endswith('.xlsx'):
             # Para XLSX usar openpyxl
             try:
-                from openpyxl import load_workbook
                 wb = load_workbook(local_path, read_only=True)
                 texto = ""
                 for sheet in wb.sheetnames:
@@ -86,6 +80,7 @@ def document_processing() -> None:
                             if cell:
                                 texto += str(cell) + " "
                         texto += "\n"
+                wb.close()  # Cerrar el workbook explícitamente
             except ImportError:
                 texto = f"Archivo XLSX: {blob.name} (necesita openpyxl)"
         else:
@@ -99,6 +94,14 @@ def document_processing() -> None:
 
         # Dividir en fragmentos
         chunks = [texto[i:i+1000] for i in range(0, len(texto), 1000)]
+
+        # Limpiar archivo temporal después de procesarlo
+        try:
+            if os.path.exists(local_path):
+                os.remove(local_path)
+        except PermissionError:
+            print(f"No se pudo eliminar el archivo temporal: {local_path}")
+            # Continuar con el procesamiento
 
         for chunk in chunks:
             try:
