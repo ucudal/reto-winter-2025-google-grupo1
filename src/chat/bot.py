@@ -22,7 +22,7 @@ class Bot:
     def make_agent(self) -> Agent[Dependencies, str]:
         return Agent(
             GoogleModel(
-                "gemini-2.5-flash",
+                "gemini-2.5-pro",
                 provider=GoogleProvider(api_key=self.__env.google_cloud_api_key),
                 settings=GoogleModelSettings(),
             ),
@@ -46,6 +46,8 @@ class Bot:
         agent = self.get_agent(user_id)
         history = retrieve_conversation(user_id)
 
+        print("\n\nStart message.")
+
         async with agent.run_stream(
             user_prompt=message.content, deps=self.get_dependencies(), message_history=history
         ) as response:
@@ -53,5 +55,7 @@ class Bot:
                 yield chunk
 
             history = response.all_messages()
+
+        print("End message.")
 
         set_conversation(user_id, history)

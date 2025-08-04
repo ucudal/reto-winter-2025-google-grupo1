@@ -2,6 +2,7 @@ from pydantic_ai import RunContext
 from pydantic_ai.toolsets import CombinedToolset, FunctionToolset
 
 from chat.types import Dependencies
+from forms.toolset import form_tools
 
 
 _local_funcs = FunctionToolset[Dependencies]()
@@ -33,6 +34,6 @@ def dev_debug_dependencies(ctx: RunContext[Dependencies], input: str) -> Depende
 
 # If you make other toolsets, add them here.
 # This is what is loaded into the bot.
-main_toolset = CombinedToolset[Dependencies]([_local_funcs]).filtered(
+main_toolset = CombinedToolset[Dependencies]([_local_funcs, form_tools]).filtered(
     lambda ctx, tool: ctx.deps.env.environment == "dev" or not tool.name.startswith("dev_")
 )
