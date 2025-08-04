@@ -1,13 +1,12 @@
-from pathlib import Path
-from typing import TypedDict
 import gradio
 
-from ui.adapter import ui_to_chat
+from ui.bridge import ui_to_chat
 from ui.types import UserInput
 
 
-def resolve(message: UserInput, _history: list[str]):
-    yield ui_to_chat(message)
+async def resolve(message: UserInput, _history: list[str]):
+    async for chunk in ui_to_chat(message):
+        yield chunk
 
 
 def main():
@@ -21,7 +20,9 @@ def main():
         description="Feel free to send a message, an image, or both!",
         flagging_mode="manual",
         flagging_options=["Like", "Spam", "Inappropriate", "Other"],
+        textbox=gradio.MultimodalTextbox(sources=["microphone", "upload"])
     )
+    
 
     _ = demo.launch()
 
