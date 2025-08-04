@@ -5,7 +5,7 @@ from chat.types import Dependencies
 from forms.toolset import form_tools
 
 
-_local_funcs = FunctionToolset[Dependencies]()
+_local_funcs = FunctionToolset[Dependencies](max_retries=3)
 
 
 # Tools that start with dev_ are filtered in prod.

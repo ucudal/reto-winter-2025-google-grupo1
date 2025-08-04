@@ -1,9 +1,11 @@
 from typing import final
 
+from google.genai.types import HarmBlockThreshold, HarmCategory
 from pydantic_ai import Agent
 from pydantic_ai.messages import UserPromptPart
 from pydantic_ai.models.google import GoogleModel, GoogleModelSettings
 from pydantic_ai.providers.google import GoogleProvider
+from pydantic_ai.toolsets import AbstractToolset
 
 from chat.memory import retrieve_conversation, set_conversation
 from chat.tools import toolset
@@ -14,19 +16,33 @@ from env import Environment
 @final
 class Bot:
     def __init__(
-        self, *, env: Environment, chats: dict[UserId, Agent[Dependencies, str]] | None = None
+        self,
+        *,
+        env: Environment,
+        toolset: AbstractToolset[Dependencies],
+        chats: dict[UserId, Agent[Dependencies, str]] | None = None,
     ) -> None:
         self.chats = chats or {}
         self.__env = env
+        self.__toolset = toolset
 
     def make_agent(self) -> Agent[Dependencies, str]:
         return Agent(
             GoogleModel(
                 "gemini-2.5-pro",
                 provider=GoogleProvider(api_key=self.__env.google_cloud_api_key),
-                settings=GoogleModelSettings(),
+                settings=GoogleModelSettings(
+                    temperature=0.2,
+                    google_safety_settings=[
+                        {
+                            "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                            "threshold": HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                        }
+                    ],
+                ),
             ),
-            toolsets=[toolset.main_toolset],
+            toolsets=[self.__toolset],
+            output_retries=10,
             deps_type=Dependencies,
         )
 

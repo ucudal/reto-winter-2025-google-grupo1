@@ -7,7 +7,8 @@ from forms.test_form import IthakaEvaluationSupportForm
 from forms.types import BadInput, ErrorResult, FormInformation
 
 
-form_tools = FunctionToolset[Dependencies]()
+form_tools = FunctionToolset[Dependencies](max_retries=3)
+
 
 # Pretend this is storage for now
 _forms = dict[UUID, IthakaEvaluationSupportForm]()
