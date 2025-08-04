@@ -1,4 +1,5 @@
 from datetime import date
+from textwrap import dedent
 from typing import Literal
 from pydantic import BaseModel, Field
 
@@ -124,7 +125,7 @@ class IthakaEvaluationSupportForm(BaseModel):
         )
     )
 
-    date_of_completion: date | None = Field(default=None, description="Date of completion. ")
+    date_of_completion: date = Field(default_factory=date.today, description="Date of completion. Empty for today.")
 
     evaluators: tuple[Evaluator | None, Evaluator | None] = Field(
         default=(None, None),
@@ -139,8 +140,7 @@ class IthakaEvaluationSupportForm(BaseModel):
         description="Answers: ¿Quién es el sponsor de Ithaka para esta idea/emprendimiento? \nDetalla el nombre o apellido de la persona del equipo de ITHAKA que presenta la oportunidad de apoyo. "
     )
 
-    ucu_community_members: tuple[UcuCommunityMember | None, UcuCommunityMember | None] = Field(
-        default=(None, None),
+    ucu_community_members: tuple[UcuCommunityMember, UcuCommunityMember | None] = Field(
         description="Answers: ¿El/La/Los emprendedore/a/s pertenecen a la comunidad UCU?  Up to two options. ",
     )
 
@@ -149,19 +149,28 @@ class IthakaEvaluationSupportForm(BaseModel):
         description="Answers: ¿De qué carrera/facultad está vinculado?  Up to two options. ",
     )
 
-    stage: tuple[Stage | None, Stage | None] = Field(
-        default=(None, None),
+    stage: tuple[Stage, Stage | None] = Field(
         description="Answers: ¿En qué etapa está?  Up to two options. ",
     )
 
     profile_type: list[ProfileType] = Field(
-        default=[],
+        min_length=1,
         description="Answers: ¿De qué tipo de perfil es la idea/emprendimiento? ",
     )
 
     potential_support: list[SupportType] = Field(
-        default=[],
-        description="Answers: ¿Qué tipo de apoyos podemos brindarle al emprendedor/a o emprendimiento según el perfil? ",
+        min_length=1,
+        description=dedent("""
+         Answers: ¿Qué tipo de apoyos podemos brindarle al emprendedor/a o emprendimiento según el perfil?
+
+         Elige el/los apoyos que se podrían dar en un plan de acción durante los
+         próximos 3 meses.
+
+         En el caso de no ser UCU y no tener valor "estratégico" para Ithaka selecciona "Ningún apoyo adicional"
+         Considera también los apoyos marcados durante la postulación para ver
+         si hay coincidencia y la experiencia previa del/la/los
+         emprendedor/a/es
+        """),
     )
 
     specific_mentor: list[Mentor] = Field(
@@ -169,8 +178,7 @@ class IthakaEvaluationSupportForm(BaseModel):
         description="Answers: ¿Hay algún tutor/mentor específico para apoyar esta idea/emprendimiento? ",
     )
 
-    follow_up_personnel: tuple[FollowUpPerson | None, FollowUpPerson | None] = Field(
-        default=(None, None),
+    follow_up_personnel: tuple[FollowUpPerson, FollowUpPerson | None] = Field(
         description="Answers: ¿Se asignará a alguien específico del equipo de Ithaka para el seguimiento?  Up to two options. ",
     )
 
