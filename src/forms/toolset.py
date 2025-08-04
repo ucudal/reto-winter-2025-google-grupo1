@@ -9,11 +9,12 @@ from forms.types import BadInput, ErrorResult, FormInformation
 
 form_tools = FunctionToolset[Dependencies](max_retries=3)
 
+
 # Pretend this is storage for now
 _forms = dict[UUID, IthakaEvaluationSupportForm]()
 
 
-@form_tools.tool()
+@form_tools.tool
 def complete_form(
     _ctx: RunContext[Dependencies], form: IthakaEvaluationSupportForm, form_id: UUID | None = None
 ) -> FormInformation | BadInput | ErrorResult:

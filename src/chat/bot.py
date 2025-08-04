@@ -62,7 +62,7 @@ class Bot:
         agent = self.get_agent(user_id)
         history = retrieve_conversation(user_id)
 
-        print("Start message.")
+        print("\n\nStart message.")
 
         async with agent.run_stream(
             user_prompt=message.content, deps=self.get_dependencies(), message_history=history
