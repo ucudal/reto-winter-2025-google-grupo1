@@ -8,7 +8,8 @@ from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.toolsets import AbstractToolset
 
 from chat.memory import retrieve_conversation, set_conversation
-from chat.tools import toolset
+from chat.memory import retrieve_conversation, set_conversation
+from chat.types import Dependencies, UserId
 from chat.types import Dependencies, UserId
 from env import Environment
 
