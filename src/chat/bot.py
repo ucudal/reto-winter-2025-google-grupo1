@@ -33,7 +33,7 @@ class Bot:
                 "gemini-2.5-pro",
                 provider=GoogleProvider(api_key=self.__env.google_cloud_api_key),
                 settings=GoogleModelSettings(
-                    temperature=0.2,
+                    temperature=0.6,
                     google_safety_settings=[
                         {
                             "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
