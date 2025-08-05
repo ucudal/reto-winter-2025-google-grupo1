@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "google-genai>=1.28.0",
     "gradio>=5.39.0",
+    "jinja2>=3.1.6",
     "pydantic>=2.11.7",
     "pydantic-ai>=0.4.11",
 ]
