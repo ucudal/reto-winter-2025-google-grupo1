@@ -8,10 +8,9 @@ from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.toolsets import AbstractToolset
 
 from chat.memory import retrieve_conversation, set_conversation
-from chat.memory import retrieve_conversation, set_conversation
-from chat.types import Dependencies, UserId
 from chat.types import Dependencies, UserId
 from env import Environment
+from prompts.system_prompt import SystemPromptParams, render_system_prompt
 
 
 @final
@@ -21,9 +20,7 @@ class Bot:
         *,
         env: Environment,
         toolset: AbstractToolset[Dependencies],
-        chats: dict[UserId, Agent[Dependencies, str]] | None = None,
     ) -> None:
-        self.chats = chats or {}
         self.__env = env
         self.__toolset = toolset
 
@@ -44,23 +41,18 @@ class Bot:
             ),
             toolsets=[self.__toolset],
             output_retries=10,
+            system_prompt=self.get_system_prompt(),
             deps_type=Dependencies,
         )
 
-    def get_agent(self, userId: UserId) -> Agent[Dependencies, str]:
-        agent = self.chats.get(userId)
-
-        if agent is None:
-            agent = self.make_agent()
-            self.chats[userId] = agent
-
-        return agent
+    def get_system_prompt(self):
+        return render_system_prompt(SystemPromptParams())
 
     def get_dependencies(self) -> Dependencies:
         return Dependencies(env=self.__env)
 
     async def answer(self, message: UserPromptPart, /, *, user_id: UserId):
-        agent = self.get_agent(user_id)
+        agent = self.make_agent()
         history = retrieve_conversation(user_id)
 
         print("\n\nStart message.")

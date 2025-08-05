@@ -4,17 +4,15 @@
 import json
 from pydantic_ai.messages import ModelMessagesTypeAdapter
 from chat.memory import MEMORY_DIR
+from prompts.system_prompt import SystemPromptParams, render_system_prompt
 
-from prompts.base_prompt import BasePromptParams, get_base_prompt
 
 
 def main() -> None:
     path = MEMORY_DIR / "schema.json"
     _ = path.write_text(json.dumps(ModelMessagesTypeAdapter.json_schema()))
 
-    system_prompt = get_base_prompt(
-        "src/prompts/templates/system_prompt_template.md", BasePromptParams()
-    )
+    system_prompt = render_system_prompt(SystemPromptParams())
     print(system_prompt)
 
 
