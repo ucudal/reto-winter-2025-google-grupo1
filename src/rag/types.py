@@ -11,8 +11,8 @@ class DocumentFragment(BaseModel):
 
 
 class RAGQuery(BaseModel):
-    """A query to search in our knowledge database (RAG). It contains information about Ithaka."""
+    """A query to search in the knowledge database (RAG)."""
 
     query: str
-    top_k: int = Field(default=3, description="Número de documentos más relevantes a recuperar")
-    similarity_threshold: float = Field(default=0.3, description="Umbral de similitud mínimo")
+    top_k: int = Field(default=3, description="Number of most relevant documents to retrieve")
+    similarity_threshold: float = Field(default=0.3, description="Minimum similarity threshold")
