@@ -1,6 +1,8 @@
+from datetime import datetime
 from typing import Mapping
 from jinja2 import Template
 from functools import cache
+from pydantic import BaseModel, Field
 
 @cache
 def _load_base_prompt(file_path: str) -> str:
@@ -30,7 +32,10 @@ def _generate_base_prompt(template_str: str, prompt_params: Mapping[str, object]
     template = Template(template_str)
     return template.render(**prompt_params)
 
-def get_base_prompt(file_path: str, prompt_params: Mapping[str, object]) -> str:
+class BasePromptParams(BaseModel):
+    date: datetime = Field(default_factory=datetime.now)
+
+def get_base_prompt(file_path: str, prompt_params: BasePromptParams) -> str:
     """
     Get a prompt for the chatbot.
 
@@ -41,4 +46,4 @@ def get_base_prompt(file_path: str, prompt_params: Mapping[str, object]) -> str:
     Returns:
         str: The base prompt.
     """
-    return _generate_base_prompt(_load_base_prompt(file_path), prompt_params)
+    return _generate_base_prompt(_load_base_prompt(file_path), prompt_params.model_dump(mode="json"))

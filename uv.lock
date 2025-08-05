@@ -1458,6 +1458,7 @@ source = { editable = "." }
 dependencies = [
     { name = "google-genai" },
     { name = "gradio" },
+    { name = "jinja2" },
     { name = "pydantic" },
     { name = "pydantic-ai" },
 ]
@@ -1466,6 +1467,7 @@ dependencies = [
 requires-dist = [
     { name = "google-genai", specifier = ">=1.28.0" },
     { name = "gradio", specifier = ">=5.39.0" },
+    { name = "jinja2", specifier = ">=3.1.6" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "pydantic-ai", specifier = ">=0.4.11" },
 ]
