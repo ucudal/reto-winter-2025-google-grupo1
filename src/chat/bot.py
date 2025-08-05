@@ -9,6 +9,7 @@ from pydantic_ai.models.google import GoogleModel, GoogleModelSettings
 from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.toolsets import AbstractToolset
 
+from chat.clients import create_bq_client, create_google_client
 from chat.memory import retrieve_conversation, set_conversation
 from chat.types import Dependencies, UserId
 from env import Environment
@@ -59,8 +60,8 @@ class Bot:
     def get_dependencies(self) -> Dependencies:
         return Dependencies(
             env=self.__env,
-            bq_client=bigquery.Client(project=self.__env.project_id),
-            google_client=genai.Client(api_key=self.__env.google_cloud_api_key).aio,
+            bq_client=create_bq_client(self.__env.project_id),
+            google_client=create_google_client(self.__env.google_cloud_api_key).aio,
         )
 
     async def answer(self, message: UserPromptPart, /, *, user_id: UserId):
