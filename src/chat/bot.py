@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from typing import final
 
 from google import genai
@@ -11,7 +12,7 @@ from pydantic_ai.toolsets import AbstractToolset
 
 from chat.clients import create_bq_client, create_google_client
 from chat.memory import retrieve_conversation, set_conversation
-from chat.types import Dependencies, UserId
+from chat.types import Answer, Dependencies, TextAnswer, UserId
 from env import Environment
 
 
@@ -62,22 +63,28 @@ class Bot:
             env=self.__env,
             bq_client=create_bq_client(self.__env.project_id),
             google_client=create_google_client(self.__env.google_cloud_api_key).aio,
+            quotes=[]
         )
 
-    async def answer(self, message: UserPromptPart, /, *, user_id: UserId):
+    async def answer(self, message: UserPromptPart, /, *, user_id: UserId) -> AsyncGenerator[Answer]:
         agent = self.get_agent(user_id)
         history = retrieve_conversation(user_id)
+        dependencies = self.get_dependencies()
 
         print("\n\nStart message.")
 
+        chunk = TextAnswer(text="")
+
         async with agent.run_stream(
-            user_prompt=message.content, deps=self.get_dependencies(), message_history=history
+            user_prompt=message.content, deps=dependencies, message_history=history
         ) as response:
             async for chunk in response.stream():
-                yield chunk
+                chunk = TextAnswer(text=chunk)
+                yield Answer(content=chunk)
 
             history = response.all_messages()
 
+        yield Answer(content=chunk, quotes=dependencies.quotes)
         print("End message.")
 
         set_conversation(user_id, history)
