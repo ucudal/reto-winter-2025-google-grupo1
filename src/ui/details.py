@@ -16,15 +16,23 @@ def render_citation(citation: Citation) -> HTML:
         </blockquote>
     """
 
+from typing import Literal
+from html import escape
+from .types import Link
+
 def render_link(link: Link) -> HTML:
+    safe_url    = escape(link.link, quote=True)
+    safe_text   = escape(link.text)
+    safe_author = escape(link.author)
+
     return f"""
         <blockquote style="margin-top: 1em; border-left: 2px solid #ccc; padding-left: 1em;">
             <p>
-                <a href="{link.link}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
-                    <i>"{link.text}"</i>
+                <a href="{safe_url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+                    <i>"{safe_text}"</i>
                 </a>
             </p>
-            <footer>— {link.author}</footer>
+            <footer>— {safe_author}</footer>
         </blockquote>
     """
 
