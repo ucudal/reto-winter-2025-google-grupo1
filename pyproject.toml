@@ -10,26 +10,27 @@ authors = [
     { name = "Milagros Kucharski" }
 ]
 
-[tool.project.maintainers]
-[[tool.project.maintainers]]
-name = "Santiago Panozzo"
-email = "santiagopanozzoa@outlook.com"
-
-[[tool.project.maintainers]]
-name = "Cristian Rodriguez"
-email = "ezponjares@gmail.com"
-
-[[tool.project.maintainers]]
-name = "Francisco Nasso"
-email = "Francisconasso@gmail.com"
-
-[[tool.project.maintainers]]
-name = "Milagros Kucharski"
-email = "milakuchper@gmail.com"
+# [tool.project.maintainers]
+# [[tool.project.maintainers]]
+# name = "Santiago Panozzo"
+# email = "santiagopanozzoa@outlook.com"
+#
+# [[tool.project.maintainers]]
+# name = "Cristian Rodriguez"
+# email = "ezponjares@gmail.com"
+#
+# [[tool.project.maintainers]]
+# name = "Francisco Nasso"
+# email = "Francisconasso@gmail.com"
+#
+# [[tool.project.maintainers]]
+# name = "Milagros Kucharski"
+# email = "milakuchper@gmail.com"
 
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    # "google-cloud-bigquery>=3.35.1",
     "bigquery>=0.0.45",
     "google-genai>=1.28.0",
     "gradio>=5.39.0",

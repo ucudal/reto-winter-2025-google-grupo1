@@ -1,0 +1,15 @@
+[
+    {
+  "parts": [
+    {
+      "content": [
+        "cursos electivos"
+      ],
+      "timestamp": "2025-08-05T02:41:23.228829Z",
+      "part_kind": "user-prompt"
+    }
+  ],
+  "instructions": null,
+  "kind": "request"
+}
+]
