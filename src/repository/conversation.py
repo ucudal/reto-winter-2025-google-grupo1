@@ -5,11 +5,14 @@ import io
 from google.cloud import bigquery
 from pydantic import BaseModel
 
+from message import MessageModel
+
 
 class ConversationModel(BaseModel):
     conversation_id: str
     user_id: str
     started_at: datetime
+    messages: list[MessageModel] = []
 
 
 class ConversationRepository:
@@ -18,6 +21,7 @@ class ConversationRepository:
     def __init__(self, client: bigquery.Client, project_id: str, dataset_id: str):
         self.client: bigquery.Client = client
         self.table_ref: str = f"{project_id}.{dataset_id}.conversations"
+        self.table_child_ref: str = f"{project_id}.{dataset_id}.messages"
         self.id_column: str = "conversation_id"
 
     def create(self, user_id: str) -> str | None:
@@ -55,14 +59,54 @@ class ConversationRepository:
 
 
     def read(self, record_id: str) -> ConversationModel | None:
-        query = f"SELECT * FROM `{self.table_ref}` WHERE {self.id_column} = @record_id LIMIT 1"
+        query = (f"""
+                    SELECT 
+                        t1.conversation_id,
+                        t1.user_id,
+                        t1.started_at,
+                        t2.message_id,
+                        t2.sender,
+                        t2.message_text,
+                        t2.timestamp AS message_timestamp
+                    FROM `{self.table_ref}` AS t1
+                    JOIN `{self.table_child_ref}` AS t2
+                    ON t1.conversation_id = t2.conversation_id
+                    WHERE t1.conversation_id = @record_id 
+                    ORDER BY t2.timestamp ASC""")
+
         job_config = bigquery.QueryJobConfig(
             query_parameters=[bigquery.ScalarQueryParameter("record_id", "STRING", record_id)]
         )
         query_job = self.client.query(query, job_config=job_config)
-        results = list(query_job.result())
+        results = query_job.result()
 
-        return ConversationModel.model_validate(dict(results[0].items())) if results else None
+        if not results.total_rows:
+            return None
+
+        first_row = next(results)
+
+        conversation_data = {
+            "conversation_id": first_row.conversation_id,
+            "user_id": first_row.user_id,
+            "started_at": first_row.started_at,
+            "messages": []
+        }
+
+        query_job = self.client.query(query, job_config=job_config)
+        for row in query_job.result():
+            if row.message_id:
+                message_data = {
+                    "message_id": row.message_id,
+                    "conversation_id": row.conversation_id,
+                    "sender": row.sender,
+                    "message_text": (row.message_text),
+                    "timestamp": row.message_timestamp
+                }
+                validated_message = MessageModel.model_validate(message_data).model_dump()
+                conversation_data["messages"].append(validated_message)
+
+        return ConversationModel.model_validate(conversation_data)
+
 
     def delete(self, record_id: str) -> bool:
         query = f"DELETE FROM `{self.table_ref}` WHERE {self.id_column} = @record_id"
