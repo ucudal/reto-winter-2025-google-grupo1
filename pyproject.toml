@@ -1,13 +1,40 @@
 [project]
 name = "reto"
 version = "0.1.0"
-description = "Add your description here"
+description = "Chatbot for Centro Ithaka"
+license = { text = "GNU AGPLv3" }
+authors = [
+    { name = "Santiago Panozzo" },
+    { name = "Cristian Rodriguez" },
+    { name = "Francisco Nasso" },
+    { name = "Milagros Kucharski" }
+]
+
+# [tool.project.maintainers]
+# [[tool.project.maintainers]]
+# name = "Santiago Panozzo"
+# email = "santiagopanozzoa@outlook.com"
+#
+# [[tool.project.maintainers]]
+# name = "Cristian Rodriguez"
+# email = "ezponjares@gmail.com"
+#
+# [[tool.project.maintainers]]
+# name = "Francisco Nasso"
+# email = "Francisconasso@gmail.com"
+#
+# [[tool.project.maintainers]]
+# name = "Milagros Kucharski"
+# email = "milakuchper@gmail.com"
+
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "google-cloud-bigquery>=3.35.1",
+    # "google-cloud-bigquery>=3.35.1",
+    "bigquery>=0.0.45",
     "google-genai>=1.28.0",
     "gradio>=5.39.0",
+    "jinja2>=3.1.6",
     "pydantic>=2.11.7",
     "pydantic-ai>=0.4.11",
 ]

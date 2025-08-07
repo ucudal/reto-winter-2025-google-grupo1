@@ -1,5 +1,7 @@
 from typing import final
 
+from google import genai
+from google.cloud import bigquery
 from google.genai.types import HarmBlockThreshold, HarmCategory
 from pydantic_ai import Agent
 from pydantic_ai.messages import UserPromptPart
@@ -7,9 +9,8 @@ from pydantic_ai.models.google import GoogleModel, GoogleModelSettings
 from pydantic_ai.providers.google import GoogleProvider
 from pydantic_ai.toolsets import AbstractToolset
 
+from chat.clients import create_bq_client, create_google_client
 from chat.memory import retrieve_conversation, set_conversation
-from chat.memory import retrieve_conversation, set_conversation
-from chat.types import Dependencies, UserId
 from chat.types import Dependencies, UserId
 from env import Environment
 
@@ -57,7 +58,11 @@ class Bot:
         return agent
 
     def get_dependencies(self) -> Dependencies:
-        return Dependencies(env=self.__env)
+        return Dependencies(
+            env=self.__env,
+            bq_client=create_bq_client(self.__env.project_id),
+            google_client=create_google_client(self.__env.google_cloud_api_key).aio,
+        )
 
     async def answer(self, message: UserPromptPart, /, *, user_id: UserId):
         agent = self.get_agent(user_id)
