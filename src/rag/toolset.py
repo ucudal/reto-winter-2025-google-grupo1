@@ -1,7 +1,7 @@
 from pydantic_ai import RunContext
 from pydantic_ai.toolsets import FunctionToolset
 
-from chat.types import Dependencies
+from chat.types import Citation, Dependencies, Quote
 from rag.rag import RAGTool
 from rag.types import DocumentFragment, RAGQuery
 
@@ -24,4 +24,11 @@ async def query_rag(ctx: RunContext[Dependencies], input: RAGQuery) -> list[tupl
     tool = RAGTool(deps=ctx.deps)
     result = await tool.retrieve_with_vector_search(input)
     print(f"{result = }")
+
+    for document, _ in result:
+        ctx.deps.quotes.append(Citation(
+            author=document.document_id,
+            text=document.fragment_text
+        ))
+
     return result
