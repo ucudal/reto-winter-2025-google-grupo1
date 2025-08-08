@@ -1,11 +1,13 @@
 from typing import Literal
 from google.cloud import bigquery
 from google.genai.client import AsyncClient
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, TypeAdapter
 from pydantic.dataclasses import dataclass
 from pydantic_ai import BinaryContent
+from pydantic_ai.messages import ModelMessage
 
 from env import Environment
+from repository.types import ConversationModel, UserModel
 
 UserId = str
 
@@ -40,3 +42,13 @@ class Dependencies:
     google_client: AsyncClient
     bq_client: bigquery.Client
     quotes: list[Quote]
+    conversation: ConversationModel
+    user: UserModel
+
+
+MessageContent = ModelMessage
+
+MessagesContentTypeAdapter = TypeAdapter(
+    list[MessageContent],
+    config=ConfigDict(defer_build=True, ser_json_bytes="base64", val_json_bytes="base64"),
+)

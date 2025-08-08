@@ -3,6 +3,7 @@ from typing import assert_never
 import gradio
 
 from chat.types import Citation, Link, Quote
+from html import escape
 
 
 HTML = str
@@ -15,10 +16,6 @@ def render_citation(citation: Citation) -> HTML:
             <footer>— {citation.author}</footer>
         </blockquote>
     """
-
-from typing import Literal
-from html import escape
-from .types import Link
 
 def render_link(link: Link) -> HTML:
     safe_url    = escape(link.link, quote=True)

@@ -1,16 +1,9 @@
-import uuid
-import json
-from datetime import datetime
 from google.cloud import bigquery
-from pydantic import BaseModel
-from typing import Dict, Any, List, Literal, Optional
-import io
 
-from conversation import ConversationRepository
-from message import MessageRepository
-from user import UserRepository
-from pathlib import Path
-from chat.memory import MessageContent, MessagesContentTypeAdapter
+from repository.conversation import ConversationRepository
+from repository.message import MessageRepository
+from repository.user import UserRepository
+
 
 
 # Asegúrate de que todas tus clases de repositorio y modelos (UserModel, ConversationModel, etc.)
