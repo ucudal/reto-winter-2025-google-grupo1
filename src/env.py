@@ -29,9 +29,7 @@ class Environment(BaseModel, frozen=True, arbitrary_types_allowed=True):
         assert isinstance(val, str)
 
         parsed = TypeAdapter(dict[str, object]).validate_json(val)
-        print(f"{parsed = }")
         output = service_account.Credentials.from_service_account_info(parsed)  # pyright: ignore[reportUnknownMemberType]
-        print(f"{output.project_id = }")
         return output
 
 
