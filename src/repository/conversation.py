@@ -1,18 +1,11 @@
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
 from __future__ import annotations
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import io
 from google.cloud import bigquery
-from pydantic import BaseModel
 
-from message import MessageModel
-
-
-class ConversationModel(BaseModel):
-    conversation_id: str
-    user_id: str
-    started_at: datetime
-    messages: list[MessageModel] = []
+from repository.types import ConversationCreationModel, ConversationModel, MessageModel
 
 
 class ConversationRepository:
@@ -24,42 +17,41 @@ class ConversationRepository:
         self.table_child_ref: str = f"{project_id}.{dataset_id}.messages"
         self.id_column: str = "conversation_id"
 
-    def create(self, user_id: str) -> str | None:
+    def create(self, user_id: str, /, *, conversation_id: str | None) -> str:
         """Crea una nueva conversación con un ID autonumérico
 
         :param user_id: El ID del usuario asociado a la conversación.
         :return: El ID de la nueva conversación si es exitosa, o None si falla.
         """
-        new_id = str(uuid.uuid4())
-        data = ConversationModel(conversation_id=new_id, user_id=user_id, started_at=datetime.utcnow())
+        if conversation_id is None:
+            conversation_id = str(uuid.uuid4())
+
+        data = ConversationCreationModel(
+            conversation_id=conversation_id, user_id=user_id, started_at=datetime.now(timezone.utc)
+        )
         json_data = data.model_dump_json()
+
 
         jsonl_data = io.StringIO(f"{json_data}\n")
 
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
-            write_disposition=bigquery.WriteDisposition.WRITE_APPEND
+            write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
         )
 
-        try:
-            load_job = self.client.load_table_from_file(
-                jsonl_data,
-                self.table_ref,
-                job_config=job_config
-            )
+        load_job = self.client.load_table_from_file(
+            jsonl_data, # pyright: ignore[reportArgumentType]
+            self.table_ref,
+            job_config=job_config
+        )
 
-            # Espera a que el trabajo de carga termine.
-            _ = load_job.result()
-            print(f"Conversation created successfully with ID: {new_id}")
-            return new_id
-        except Exception as e:
-            # Captura cualquier excepción que ocurra durante la carga
-            print(f"Error creating conversation: {e}")
-            return None
-
+        # Espera a que el trabajo de carga termine.
+        _ = load_job.result()
+        print(f"Conversation created successfully with ID: {conversation_id}")
+        return conversation_id
 
     def read(self, record_id: str) -> ConversationModel | None:
-        query = (f"""
+        query = f"""
                     SELECT 
                         t1.conversation_id,
                         t1.user_id,
@@ -72,7 +64,7 @@ class ConversationRepository:
                     JOIN `{self.table_child_ref}` AS t2
                     ON t1.conversation_id = t2.conversation_id
                     WHERE t1.conversation_id = @record_id 
-                    ORDER BY t2.timestamp ASC""")
+                    ORDER BY t2.timestamp ASC"""
 
         job_config = bigquery.QueryJobConfig(
             query_parameters=[bigquery.ScalarQueryParameter("record_id", "STRING", record_id)]
@@ -89,7 +81,7 @@ class ConversationRepository:
             "conversation_id": first_row.conversation_id,
             "user_id": first_row.user_id,
             "started_at": first_row.started_at,
-            "messages": []
+            "messages": [],
         }
 
         query_job = self.client.query(query, job_config=job_config)
@@ -100,13 +92,12 @@ class ConversationRepository:
                     "conversation_id": row.conversation_id,
                     "sender": row.sender,
                     "message_text": (row.message_text),
-                    "timestamp": row.message_timestamp
+                    "timestamp": row.message_timestamp,
                 }
                 validated_message = MessageModel.model_validate(message_data).model_dump()
-                conversation_data["messages"].append(validated_message)
+                _ = conversation_data["messages"].append(validated_message)
 
         return ConversationModel.model_validate(conversation_data)
-
 
     def delete(self, record_id: str) -> bool:
         query = f"DELETE FROM `{self.table_ref}` WHERE {self.id_column} = @record_id"

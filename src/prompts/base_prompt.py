@@ -1,4 +1,5 @@
-from typing import Mapping
+# pyright: reportAny=false
+from collections.abc import Mapping
 from jinja2 import Template
 from functools import cache
 
