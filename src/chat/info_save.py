@@ -2,18 +2,19 @@
 
 import asyncio
 from uuid import uuid4
+from google.auth.credentials import Credentials
 from google.cloud import storage
 from pydantic_ai import AudioUrl, BinaryContent, DocumentUrl, ImageUrl, VideoUrl
 
 StoredUrl = ImageUrl | AudioUrl | DocumentUrl | VideoUrl
 
 
-async def upload(file: BinaryContent) -> StoredUrl:
+async def upload(file: BinaryContent, credentials: Credentials) -> StoredUrl:
     loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(None, _sync_upload, file)
+    return await loop.run_in_executor(None, _sync_upload, file, credentials)
 
-def _sync_upload(file: BinaryContent) -> StoredUrl:
-    client = storage.Client()
+def _sync_upload(file: BinaryContent, credentials: Credentials) -> StoredUrl:
+    client = storage.Client(credentials=credentials)
     bucket_name = "reto_winter_equipo1"
     bucket = client.bucket(bucket_name)
 
@@ -24,7 +25,6 @@ def _sync_upload(file: BinaryContent) -> StoredUrl:
 
     blob = bucket.blob(blob_name)
     blob.upload_from_string(file.data, content_type=mime_type)
-    blob.make_public()
 
     public_url = blob.public_url
     return tag_url(public_url, mime_type)

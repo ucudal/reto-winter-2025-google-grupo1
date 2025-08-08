@@ -75,9 +75,8 @@ class Bot:
             user_prompt=message.content, deps=dependencies, message_history=self.get_history()
         )
         result = await upload(
-            await TextToSpeechService().generate_audio(
-                output.output
-            )
+            await TextToSpeechService(self.get_dependencies().env).generate_audio(output.output),
+            credentials=dependencies.env.credentials
         )
 
         return self.include_extra_data(Answer(content=result))

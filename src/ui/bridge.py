@@ -7,6 +7,7 @@ from pydantic_ai import BinaryContent
 from pydantic_ai.messages import UserPromptPart
 from chat.factory import BotFactory
 from chat.info_save import StoredUrl, upload
+from env import env
 from ui.types import Renderable, UserInput, OutputDir
 from ui.details import render_quotes
 from ui.file_renderer import render_binary
@@ -26,7 +27,7 @@ def read_file(file_path: Path) -> BinaryContent | None:
 
 
 async def handle_file(file: BinaryContent) -> StoredUrl:
-    return await upload(file)
+    return await upload(file, credentials=env().credentials)
 
 def get_bot():
     return BotFactory().default()

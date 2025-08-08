@@ -3,7 +3,6 @@ from google.cloud import bigquery
 from google.genai.client import AsyncClient
 from pydantic import BaseModel, ConfigDict, TypeAdapter
 from pydantic.dataclasses import dataclass
-from pydantic_ai import BinaryContent
 from pydantic_ai.messages import ModelMessage
 
 from chat.info_save import StoredUrl
