@@ -16,6 +16,7 @@ def main():
     """
     demo = gradio.ChatInterface(
         fn=resolve,
+        type="messages",
         multimodal=True,
         title="🖼️ Multimodal Chat Assistant",
         description="Feel free to send a message, an image, or both!",

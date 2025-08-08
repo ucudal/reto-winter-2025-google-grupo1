@@ -37,6 +37,8 @@ dependencies = [
     "jinja2>=3.1.6",
     "pydantic>=2.11.7",
     "pydantic-ai>=0.4.11",
+    "google-cloud-texttospeech>=2.14.0",
+    "google-cloud-storage>=2.10.0",
 ]
 
 [tool.ruff]
