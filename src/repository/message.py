@@ -14,8 +14,7 @@ class MessageRepository:
     def __init__(self, client: bigquery.Client, project_id: str, dataset_id: str):
         self.client: bigquery.Client = client
         self.table_ref: str = f"{project_id}.{dataset_id}.messages"
-        self.id_column: str = "conversation_id"
-        self.id_column = "message_id"
+        self.id_column: str = "message_id"
 
     def create(self, conversation_id: str, sender: SenderType , content: Sequence[ModelMessage]) -> str:
         """Crea un nuevo mensaje con un ID autonumérico, manejando errores.
