@@ -14,6 +14,7 @@ Evaluator = Literal[
     "Victoria Mignone",
     "Oscar de Oliveira Madeira",
     "Otras",
+    "NULL",
 ]
 
 UcuCommunityMember = Literal[
@@ -22,6 +23,7 @@ UcuCommunityMember = Literal[
     "Docente",
     "Funcionario/a",
     "Otras",
+    "NULL",
 ]
 
 Faculty = Literal[
@@ -31,6 +33,7 @@ Faculty = Literal[
     "FAV",
     "UCU BUSINESS",
     "Otras",
+    "NULL",
 ]
 
 Stage = Literal[
@@ -40,6 +43,7 @@ Stage = Literal[
     "Crecimiento/Expansión",
     "Transformación/Spin off",
     "Otras",
+    "NULL",
 ]
 
 ProfileType = Literal[
@@ -102,6 +106,7 @@ FollowUpPerson = Literal[
     "Victoria Mignone",
     "Oscar de Oliveira Madeira",
     "Otras",
+    "NULL",
 ]
 
 
