@@ -1,7 +1,7 @@
 from pydantic_ai import RunContext
 from pydantic_ai.toolsets import FunctionToolset
 
-from chat.types import Citation, Dependencies, Quote
+from chat.types import Citation, Dependencies
 from rag.rag import RAGTool
 from rag.types import DocumentFragment, RAGQuery
 

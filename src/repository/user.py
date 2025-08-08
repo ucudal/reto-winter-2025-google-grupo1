@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 import io
-import json
 import uuid
 
 from google.cloud import bigquery
-from pydantic import BaseModel
 
-class UserModel(BaseModel):
-    user_id: str
+from repository.types import UserModel
 
 class UserRepository:
     """Repository implementation for the users table in BigQuery."""
@@ -24,7 +21,7 @@ class UserRepository:
         data = UserModel(user_id=new_id)
         json_data = data.model_dump_json()
 
-        jsonl_data = io.StringIO(f"{json_data}\n")
+        jsonl_data = io.BytesIO(f"{json_data}\n".encode())
 
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,

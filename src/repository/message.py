@@ -1,23 +1,12 @@
 from __future__ import annotations
+from collections.abc import Sequence
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 import io
-from typing import Literal, Dict, Any, Optional
 from google.cloud import bigquery
-from pydantic import BaseModel
+from pydantic_ai.messages import ModelMessage
 
-from chat.memory import MessageContent, MessagesContentTypeAdapter
-SenderType = Literal["user", "assistant"]
-class MessageModel(BaseModel):
-    message_id: str
-    conversation_id: str
-    sender: SenderType
-    # A singular message may contain multiple parts (text, quotes, files)
-    message_text: list[MessageContent]
-    # I wonder how precise this is, since I will be creating both the user
-    # prompt and and model question at the same time.
-    timestamp: Optional[datetime]
-
+from repository.types import MessageModel, SenderType
 
 class MessageRepository:
     """Repository implementation for the messages table in BigQuery."""
@@ -25,10 +14,9 @@ class MessageRepository:
     def __init__(self, client: bigquery.Client, project_id: str, dataset_id: str):
         self.client: bigquery.Client = client
         self.table_ref: str = f"{project_id}.{dataset_id}.messages"
-        self.id_column: str = "conversation_id"
-        self.id_column = "message_id"
+        self.id_column: str = "message_id"
 
-    def create(self, conversation_id: str, sender: SenderType ,message_json: list[MessageContent]) -> str | None:
+    def create(self, conversation_id: str, sender: SenderType , content: Sequence[ModelMessage]) -> str:
         """Crea un nuevo mensaje con un ID autonumérico, manejando errores.
 
         :param conversation_id: El ID de la conversación a la que pertenece el mensaje.
@@ -40,12 +28,12 @@ class MessageRepository:
             message_id=new_id,
             conversation_id=conversation_id,
             sender=sender,
-            timestamp=datetime.utcnow(),
-            message_text=message_json,
+            timestamp=datetime.now(timezone.utc),
+            message_text=list(content),
         )
         json_data = data.model_dump_json()
 
-        jsonl_data = io.StringIO(f"{json_data}\n")
+        jsonl_data = io.BytesIO(f"{json_data}\n".encode())
 
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
