@@ -32,7 +32,7 @@ class ConversationRepository:
         json_data = data.model_dump_json()
 
 
-        jsonl_data = io.StringIO(f"{json_data}\n")
+        jsonl_data = io.BytesIO(f"{json_data}\n".encode())
 
         job_config = bigquery.LoadJobConfig(
             source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
@@ -40,7 +40,7 @@ class ConversationRepository:
         )
 
         load_job = self.client.load_table_from_file(
-            jsonl_data, # pyright: ignore[reportArgumentType]
+            jsonl_data,
             self.table_ref,
             job_config=job_config
         )
