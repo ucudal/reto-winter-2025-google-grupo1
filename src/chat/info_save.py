@@ -4,10 +4,11 @@ from uuid import uuid4
 from google.cloud import storage
 from pydantic_ai import AudioUrl, BinaryContent, DocumentUrl, ImageUrl, VideoUrl
 
+StoredUrl = ImageUrl | AudioUrl | DocumentUrl | VideoUrl
 
 async def upload(
     file: BinaryContent
-) -> ImageUrl | AudioUrl | DocumentUrl | VideoUrl:
+) -> StoredUrl:
     """
     Sube un archivo a Google Cloud Storage y retorna la URL correspondiente.
 
@@ -78,7 +79,7 @@ def get_file_extension(mime_type: str) -> str:
     return extensions.get(mime_type, ".bin")
 
 
-def create_typed_url(url: str, mime_type: str) -> ImageUrl | AudioUrl | DocumentUrl | VideoUrl:
+def create_typed_url(url: str, mime_type: str) -> StoredUrl:
     """
     Crea el tipo de URL apropiado basado en el tipo MIME.
 

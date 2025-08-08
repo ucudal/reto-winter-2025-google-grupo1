@@ -1,3 +1,4 @@
+# pyright: reportUnknownVariableType=false, reportUnknownMemberType=false
 from typing import cast, final
 from google.cloud import bigquery
 from google.genai.types import ContentEmbedding
