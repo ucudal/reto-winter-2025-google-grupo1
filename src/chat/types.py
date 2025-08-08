@@ -6,6 +6,7 @@ from pydantic.dataclasses import dataclass
 from pydantic_ai import BinaryContent
 from pydantic_ai.messages import ModelMessage
 
+from chat.info_save import StoredUrl
 from env import Environment
 from repository.types import ConversationModel, UserModel
 
@@ -30,7 +31,7 @@ class TextAnswer(BaseModel):
     kind: Literal["text"] = "text"
     text: str
 
-AnswerPart = TextAnswer | BinaryContent
+AnswerPart = TextAnswer | StoredUrl
 
 class Answer(BaseModel):
     content: AnswerPart

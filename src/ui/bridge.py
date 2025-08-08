@@ -1,7 +1,6 @@
 from collections.abc import AsyncIterable
 import mimetypes
 from pathlib import Path
-from typing import assert_never
 
 from gradio import Component
 from pydantic_ai import BinaryContent
@@ -49,12 +48,8 @@ async def ui_to_chat(message: UserInput) -> AsyncIterable[Renderable]:
         match content.kind:
             case "text":
                 content = content.text
-            case "binary":
-                # Untested, also, horribly, terribly inefficient. Shameful.
-                # Disgraceful.
-                content = assistant(render_binary(content))
             case _:
-                assert_never(content.kind)
+                content = assistant(render_binary(content))
 
         yield content
 

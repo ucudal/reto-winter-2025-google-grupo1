@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 EnvironmentTag = Literal["prod", "dev"]
 MemoryTag = Literal["local", "bigquery"]
+AnswerTag = Literal["text", "audio"]
 
 class Environment(BaseModel, frozen=True):
     google_cloud_api_key: str = Field(alias="GOOGLE_CLOUD_API_KEY")
@@ -17,6 +18,7 @@ class Environment(BaseModel, frozen=True):
     dataset: str = Field(alias='DATASET')
     table: str = Field(alias='TABLE')
     memory: MemoryTag = Field(default="local", alias="MEMORY")
+    answer: AnswerTag = Field(default="text", alias="ANSWER")
 
 
 # This is the only global state, but that's intentional.

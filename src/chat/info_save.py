@@ -1,52 +1,33 @@
 # pyright: reportMissingTypeStubs=false, reportUnknownMemberType=false
 
+import asyncio
 from uuid import uuid4
 from google.cloud import storage
 from pydantic_ai import AudioUrl, BinaryContent, DocumentUrl, ImageUrl, VideoUrl
 
 StoredUrl = ImageUrl | AudioUrl | DocumentUrl | VideoUrl
 
-async def upload(
-    file: BinaryContent
-) -> StoredUrl:
-    """
-    Sube un archivo a Google Cloud Storage y retorna la URL correspondiente.
 
-    Args:
-        file: Contenido binario del archivo
-        userId: ID del usuario
-        conversationId: ID de la conversación
+async def upload(file: BinaryContent) -> StoredUrl:
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, _sync_upload, file)
 
-    Returns:
-        URL del archivo subido (ImageUrl, AudioUrl, FileUrl, o VideoUrl)
-    """
-    file.media_type
-
-    # Inicializar cliente de Cloud Storage
+def _sync_upload(file: BinaryContent) -> StoredUrl:
     client = storage.Client()
     bucket_name = "reto_winter_equipo1"
     bucket = client.bucket(bucket_name)
 
-    # Detectar tipo de archivo basado en el contenido
     mime_type = file.media_type
-
-    # Determinar extensión del archivo
     extension = get_file_extension(mime_type)
-
-    # Generar nombre único del archivo
     file_id = str(uuid4())
     blob_name = f"uploads/{file_id}{extension}"
 
-    # Crear blob y subir archivo
     blob = bucket.blob(blob_name)
     blob.upload_from_string(file.data, content_type=mime_type)
-
     blob.make_public()
 
     public_url = blob.public_url
-
-    # Retornar el tipo de URL apropiado basado en el tipo de archivo
-    return create_typed_url(public_url, mime_type)
+    return tag_url(public_url, mime_type)
 
 
 def get_file_extension(mime_type: str) -> str:
@@ -79,7 +60,7 @@ def get_file_extension(mime_type: str) -> str:
     return extensions.get(mime_type, ".bin")
 
 
-def create_typed_url(url: str, mime_type: str) -> StoredUrl:
+def tag_url(url: str, mime_type: str) -> StoredUrl:
     """
     Crea el tipo de URL apropiado basado en el tipo MIME.
 
